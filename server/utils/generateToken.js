@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import pool from '../utils/pgConnection.js';
+import {queryDB} from '../utils/pgConnection.js';
 
 
  const generateResetToken = async (email) => {
@@ -8,8 +8,9 @@ import pool from '../utils/pgConnection.js';
         const resetToken = crypto.randomBytes(32).toString("hex");
 
         // Store the reset token in the database with an expiration time
-        const query = "UPDATE employees SET tokens = $1, reset_token_expiry = NOW() + INTERVAL '1 hour' WHERE email = $2";
-        await pool.query(query, [resetToken, email]);
+        ///const query = 
+        await queryDB("UPDATE employees SET tokens = $1, reset_token_expiry = NOW() + INTERVAL '1 hour' WHERE email = $2",
+             [resetToken, email]);
 
         return resetToken;
     }   catch (error) {
@@ -18,3 +19,7 @@ import pool from '../utils/pgConnection.js';
     } 
 }
 export default generateResetToken;
+
+
+
+

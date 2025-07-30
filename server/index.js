@@ -6,10 +6,13 @@ import sendEmailRoute from './routes/sendEmailRoute.js';
 import userAuthRoute from './routes/userAuthRoutes.js';
 import CategoryExpenseRoute from './routes/CategoryExpenseRoute.js';
 import CashRequestRoute from './routes/cashRequestRoute.js';
+import pettyCashFundsRoute from './routes/pettyCashFundsRoute.js'
 
 dotenv.config();
 
 const app = express();
+
+const API_MASTER = process.env.API_VERSION; // fallback if env var is missing
 
 // CORS configuration
 app.use(cors({
@@ -34,6 +37,8 @@ const testPgConnection = async() => {
 }
 testPgConnection();
 
+console.log('API_MASTER:', API_MASTER);
+
 // Debug middleware - remove this after fixing the issue
 app.use((req, res, next) => {
 console.log('Request method:', req.method);
@@ -45,10 +50,17 @@ console.log('Request method:', req.method);
 
 
 // Routes
-app.use('/sendEmailNotifications', sendEmailRoute);
-app.use('/userAuth', userAuthRoute);
-app.use('/categoryExpense',CategoryExpenseRoute);
-app.use('/CashRequest',CashRequestRoute);
+app.use(API_MASTER, sendEmailRoute);
+app.use(API_MASTER, userAuthRoute);
+app.use(API_MASTER,CategoryExpenseRoute);
+app.use(API_MASTER,CashRequestRoute);
+app.use(API_MASTER, pettyCashFundsRoute);
+
+// app.use(`${api}/sendEmailNotifications`, sendEmailRoute);
+// app.use(`${api}/userAuth`, userAuthRoute);
+// app.use(`${api}/categoryExpense`,CategoryExpenseRoute);
+// app.use(`${api}/CashRequest`,CashRequestRoute);
+
 
 const servePort = process.env.SERVER_PORT || 3000;
 app.listen(servePort, () => {

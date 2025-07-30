@@ -1,5 +1,7 @@
+import {queryDB} from '../utils/pgConnection.js';
+
 //  const generateEmployeeId = async (pool) => {
-//     const result = await pool.query("SELECT employee_id FROM employees ORDER BY employee_id DESC LIMIT 1");
+//     const result = await queryDB("SELECT employee_id FROM employees ORDER BY employee_id DESC LIMIT 1");
 //     let nextNumber = 1;
 //     if (result.rows.length > 0) {
 //         // Extract numeric part and increment
@@ -12,9 +14,9 @@
 // export default generateEmployeeId;
 3
 
-const generateEmployeeId = async (pool) => {
+const generateEmployeeId = async () => {
     // Query employee_code instead of employee_id since we're generating EMP codes
-    const result = await pool.query("SELECT employee_code FROM employees WHERE employee_code LIKE 'EMP%' ORDER BY employee_code DESC LIMIT 1");
+    const result = await queryDB("SELECT employee_code FROM employees WHERE employee_code LIKE 'EMP%' ORDER BY employee_code DESC LIMIT 1");
     let nextNumber = 1;
     if (result.rows.length > 0 && result.rows[0].employee_code) {
         const lastCode = result.rows[0].employee_code;

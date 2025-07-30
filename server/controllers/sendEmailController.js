@@ -51,15 +51,15 @@ export const sendSingleEmailNotification = async (req, res) => {
 
 export const sendEmailsForInternalUse = async (receiverEmail, subject, content, isHtml = false) => {
     if (!receiverEmail || (Array.isArray(receiverEmail) && receiverEmail.length === 0) || (typeof receiverEmail !== 'string' && !Array.isArray(receiverEmail))) {
-        console.error('Internal Email Error: Invalid or missing "receiverEmail" address(es).');
+        console.error({errorMessage:"Invalid or missing 'receiverEmail' address(es)."});
         return false;
     }
     if (!subject) {
-        console.error('Internal Email Error: Missing "subject".');
+        console.error({errorMessage:"Internal Email Error Missing 'subject'."});
         return false;
     }
     if (!content) {
-        console.error('Internal Email Error: Missing "content".');
+        console.error({errorMessage:'Internal Email Error Missing "content".'});
         return false;
     }
 
@@ -80,7 +80,7 @@ export const sendEmailsForInternalUse = async (receiverEmail, subject, content, 
         console.log(`Internal email sent successfully. To: ${Array.isArray(to) ? to.join(', ') : to}. Subject: "${subject}". Message ID: ${info.messageId}`);
         return true; // Indicate success
     } catch (error) {
-        console.error(`Internal Email Error sending to ${Array.isArray(to) ? to.join(', ') : to}. Subject: "${subject}". Error:`, error);
+        console.error(`Internal Email Error sending to ${Array.isArray(to) ? to.join(', ') : to}. Subject: "${subject}".errorMessage:`, error);
         return false; // Indicate failure
     }
 }

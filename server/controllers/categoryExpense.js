@@ -1,4 +1,4 @@
-import pool from '../utils/pgConnection.js';
+import { queryDB } from "../utils/pgConnection.js";
 
 
 
@@ -12,7 +12,7 @@ export const addExpense = async(req, res) =>{
 
         const query = `INSERT INTO expense_categories(category_id, category_name, category_description) VALUES ($1, $2, $3) RETURNING *`;
         const values = [category_id, category_name, category_description];
-        const result = await pool.query(query, values);
+        const result = await queryDB(query, values);
         const newExpense = result.rows[0];
         if (!newExpense) {
             return res.status(400).json({ errorMessage: "Failed to add expense." });
@@ -28,7 +28,7 @@ export const addExpense = async(req, res) =>{
 export const getAllExpenses = async(req, res) => {
     try {
         const query = "SELECT * FROM expense_categories";
-        const result = await pool.query(query);
+        const result = await queryDB(query);
         const expenses = result.rows;
         if (expenses.length === 0) {
             return res.status(404).json({ errorMessage: "No expenses found." });
@@ -50,7 +50,7 @@ export const updateExpense = async(req, res) =>{
 
         const query = `UPDATE expense_categories SET category_name = $1, category_description = $2 WHERE category_id = $3 RETURNING *`;
         const values = [category_name, category_description, category_id];
-        const result = await pool.query(query, values);
+        const result = await queryDB(query, values);
         const updatedExpense = result.rows[0];
         if (!updatedExpense) {
             return res.status(404).json({ errorMessage: "Expense not found." });
@@ -71,7 +71,7 @@ export const deleteExpense = async(req, res) =>{
             return res.status(400).json({ errorMessage: "Category ID is required." });
         }
         const query = "DELETE FROM expense_categories WHERE category_id = $1 RETURNING *";
-        const result = await pool.query(query, [category_id]);
+        const result = await queryDB(query, [category_id]);
         const deletedExpense = result.rows[0];
         if (!deletedExpense) {
             return res.status(404).json({ errorMessage: "Expense not found." });

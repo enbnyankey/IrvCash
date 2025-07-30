@@ -1,4 +1,4 @@
-import pool from "../utils/pgConnection.js";
+import queryDB from "../utils/pgConnection.js";
 
 
 
@@ -15,7 +15,7 @@ export const addRequest = async (req, res) => {
         const query = `INSERT INTO replenishment_requests (fund_id,request_date,requested_amount, requested_by)
         VALUES ($1, $2, $3, $4) RETURNING *`;
         const values = [ 1,request_date,requested_amount, requested_by];
-        const result = await pool.query(query, values);
+        const result = await queryDB(query, values);
         const newRequest = result.rows[0];
         if (!newRequest) {
             return res.status(400).json({ errorMessage: "Failed to add request" });
@@ -34,7 +34,7 @@ export const getAllRequests = async (req, res) => {
     try{
         const query = "SELECT * FROM replenishment_requests";
         // const values = [request_id];
-        const result = await pool.query(query);
+        const result = await queryDB(query);
         const requests = result.rows;
         if (requests.length === 0) {
             return res.status(404).json({ errorMessage: "No requests found" });
@@ -59,7 +59,7 @@ export const deleteRequest = async (req, res) => {
 
         const query = "DELETE FROM replenishment_requests WHERE request_id = $1 RETURNING *";
         const values = [request_id];
-        const result = await pool.query(query, values);
+        const result = await queryDB(query, values);
         const deletedRequest = result.rows[0];
         if (!deletedRequest) {
             return res.status(404).json({ errorMessage: "Request not found" });
@@ -82,7 +82,7 @@ export const updateRequest = async (req, res) => {
             return res.status(400).json({ errorMessage: "All fields are required" });
         }
         const values = [requested_amount, requested_by, request_id];
-        const result = await pool.query(query, values);
+        const result = await queryDB(query, values);
         const updatedRequest = result.rows[0];  
         if (!updatedRequest) {
             return res.status(404).json({ errorMessage: "Request not found" });
@@ -115,7 +115,7 @@ export const rejectedRequest = async (req, res) => {
         `;
 
         const values = [request_id, reason || null];
-        const result = await pool.query(query, values);
+        const result = await queryDB(query, values);
         const approvedRequest = result.rows[0];
 
         if (!approvedRequest) {
@@ -144,18 +144,18 @@ export const approvedRequest = async (req, res) => {
 
         // Update the status to 'REJECTED' and optionally store a reason
         const query = `
-            UPDATE petty_cash_requests
-            SET status = 'APPROVED', rejection_reason = $2, updated_at = NOW()
-            WHERE id = $1 AND status = 'PENDING'
-            RETURNING *;
+            UPDATE replenishment_requests
+            SET status = 'approved'
+            WHERE request_id = $1 AND status = 'pending'
         `;
 
-        const values = [request_id, reason || null];
-        const result = await pool.query(query, values);
+        // const values = [request_id, reason || null];
+        const values = [request_id];
+        const result = await queryDB(query, values);
         const approvedRequest = result.rows[0];
 
         if (!approvedRequest) {
-            return res.status(404).json({ errorMessage: "Pending request not found or already processed" });
+            return res.status(200).json({ errorMessage: "Pending request not found or already processed" });
         }
 
         res.status(200).json({ message: "Request rejected successfully", request: approvedRequest });
@@ -180,7 +180,7 @@ export const getRequestById = async (req, res) => {
 
         const query = "SELECT * FROM replenishment_requests WHERE request_id = $1";
         const values = [request_id];
-        const result = await pool.query(query, values);
+        const result = await queryDB(query, values);
         const request = result.rows[0];
 
         if (!request) {

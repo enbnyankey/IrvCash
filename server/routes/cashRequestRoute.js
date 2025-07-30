@@ -7,8 +7,8 @@ router.post('/addRequest', addRequest);
 router.delete('/deleteRequest', deleteRequest);
 router.post('/updateRequest', updateRequest);
 router.get('/getAllRequest', getAllRequests);
-router.get('/rejectedRequest', rejectedRequest);
-router.get('/approvedRequest', approvedRequest);
+router.post('/rejectedRequest', rejectedRequest);
+router.post('/approvedRequest', approvedRequest);
 
 
 export default router;
