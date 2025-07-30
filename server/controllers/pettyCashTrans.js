@@ -26,7 +26,7 @@ export const getCashTrans = async (req, res) => {
   try {
     const { transaction_id } = req.body;
     const result = await queryDB(
-      `select * from perry_cash_transactions where transaction_id = $1`,
+      `select * from petty_cash_transactions where transaction_id = $1`,
       [transaction_id]
     );
     const data = result.rows;
@@ -78,49 +78,47 @@ export const getCashTrans = async (req, res) => {
 
 // }
 
-
-
 export const getAllfundReconciliation = async (req, res) => {
-    try{
-        const result = await queryDB(
-            `select * from petty_cash_reconciliation`
-        );
-        const data = result.rows;
-        if(!data.length === 0){
-            res.status(404).json({ errorMessage: "No petty cash reconciliation found." });
-
-        }
-        res.status(200).json({
-            message: "Petty cash reconciliation retrieved successfully",
-            data,
-        });
-
-
-    }catch(error){
-        console.error("Error occurred while reconciling funds:", error);
-        res.status(500).json({ errorMessage: "Internal server error" });
+  try {
+    const result = await queryDB(`select * from fund_reconciliation`);
+    const data = result.rows;
+    if (!data.length === 0) {
+      res
+        .status(404)
+        .json({ errorMessage: "No petty cash reconciliation found." });
     }
-}
+    res.status(200).json({
+      message: "Petty cash reconciliation retrieved successfully",
+      data,
+    });
+  } catch (error) {
+    console.error("Error occurred while reconciling funds:", error);
+    res.status(500).json({ errorMessage: "Internal server error" });
+  }
+};
 
-export const getfundReconciliation = async(req, res) =>{
-    try{
-        const { reconciliation_id } = req.body;
-        const result = await queryDB(
-            `select * from petty_cash_reconciliation where reconciliation_id = $1`,
-            [reconciliation_id]
-        );
-        const data = result.rows;
+export const getfundReconciliation = async (req, res) => {
+  try {
+    const { reconciliation_id } = req.body;
+    const result = await queryDB(
+      `select * from fund_reconciliation where reconciliation_id = $1`,
+      [reconciliation_id]
+    );
 
-        if(!data.length === 0){
-            res.status(404).json({ errorMessage: "No petty cash reconciliation found." });
-        }
-        res.status(200).json({
-            message: "Petty cash reconciliation retrieved successfully",
-            data,
-        });
-
-    }catch(error){
-        console.error("Error occurred while fetching petty cash reconciliation:", error);
-        res.status(500).json({ errorMessage: "Internal server error" });
+    if(result.rows.length === 0) {
+      return res.status(404).json({ errorMessage: "No petty cash reconciliation found." });
     }
-}
+     const data = result.rows[0];
+     return res.status(200).json({
+      message: "Petty cash reconciliation retrieved successfully",
+      data,
+    });
+    
+  } catch (error) {
+    console.error(
+      "Error occurred while fetching petty cash reconciliation:",
+      error
+    );
+    res.status(500).json({ errorMessage: "Internal server error" });
+  }
+};

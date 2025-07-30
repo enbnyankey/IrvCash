@@ -6,7 +6,8 @@ import sendEmailRoute from './routes/sendEmailRoute.js';
 import userAuthRoute from './routes/userAuthRoutes.js';
 import CategoryExpenseRoute from './routes/CategoryExpenseRoute.js';
 import CashRequestRoute from './routes/cashRequestRoute.js';
-import pettyCashFundsRoute from './routes/pettyCashFundsRoute.js'
+import pettyCashFundsRoute from './routes/pettyCashFundsRoute.js';
+import pettyCashTransRoute from './routes/pettyCashTransRoutes.js';
 
 dotenv.config();
 
@@ -55,6 +56,7 @@ app.use(API_MASTER, userAuthRoute);
 app.use(API_MASTER,CategoryExpenseRoute);
 app.use(API_MASTER,CashRequestRoute);
 app.use(API_MASTER, pettyCashFundsRoute);
+app.use(API_MASTER, pettyCashTransRoute);;
 
 // app.use(`${api}/sendEmailNotifications`, sendEmailRoute);
 // app.use(`${api}/userAuth`, userAuthRoute);
