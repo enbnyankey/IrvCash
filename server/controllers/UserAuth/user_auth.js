@@ -85,7 +85,9 @@ export const signup = async (req, res) => {
     }
 
     // Insert user without token first
-    const query = `INSERT INTO employees (employee_code, first_name, last_name, email, department, position, password) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
+    const query = `INSERT INTO employees
+     (employee_code, first_name, last_name, email, department, position, password) 
+     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
     const result = await queryDB(query, [
       employeeId,
       first_name,
@@ -96,15 +98,11 @@ export const signup = async (req, res) => {
       hashedPassword,
     ]);
     const user = result.rows[0];
-
     if (!user) {
       return res.status(400).json({ errorMessage: "User already exists." });
     }
-
     // Generate JWT token using the new user's id
     const token = createJWT(email, user.id);
-
-    // Update the tokens column for this user
     // Update the tokens column for this user
     await queryDB(
       "UPDATE employees SET tokens = $1 WHERE employee_code = $2",
@@ -112,6 +110,16 @@ export const signup = async (req, res) => {
     );
     console.log("User signed up with email:", email, "and token:", token);
 
+    const html = renderTemplate('welcome', {
+      name: getFirstName(email),
+      message: "Welcome to our PettyCash application! Your account has been created successfully.",
+    });
+    await emailTransporter.sendMail({
+      from: process.env.MAIL_USERNAME,
+      to: email,
+      subject: "Welcome to Our PettyCash Application",
+      html,
+    });
     return res
       .status(201)
       .json({ message: "User created successfully!", token });
@@ -132,7 +140,7 @@ function getFirstName(email) {
 
 function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
-}
+};
 export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -302,4 +310,4 @@ export const refreshToken = async(req, res) =>{
       .status(500)
       .json({ errorMessage: "Internal server error during refresh token." });
   }
-}
+};
